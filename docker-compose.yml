@@ -69,3 +69,17 @@ services:
       - MYSQL_USER=${DB_USER:-phper}
       - MYSQL_PASSWORD=${DB_PASS:-secret}
       - MYSQL_ROOT_PASSWORD=${DB_PASS:-secret}
+  # for image postgres
+  # db:
+  #   image: postgres:11
+  #   container_name: db
+  #   environment:
+  #     TZ: 'Asia/Tokyo'
+  #     POSTGRES_USER: 'docker'
+  #     POSTGRES_PASSWORD: 'docker'
+  #     POSTGRES_DB: 'laravel_development'
+  #   volumes:
+  #     - ./docker/db/data:/var/lib/postgresql/data
+  #     - ./docker/db/sql:/docker-entrypoint-initdb.d
+  #   ports:
+  #     - 5432:5432
