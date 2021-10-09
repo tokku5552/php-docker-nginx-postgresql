@@ -72,6 +72,14 @@ make db
 ```
 
 - dbコンテナのMySQLに接続する
+```
+make sql
+```
+
+- dbコンテナのPostgreSQLに接続する
+```
+make psql
+```
 
 ## Container structures
 
