@@ -122,6 +122,8 @@ db:
 	docker compose exec db bash
 sql:
 	docker compose exec db bash -c 'mysql -u $$MYSQL_USER -p$$MYSQL_PASSWORD $$MYSQL_DATABASE'
+psql:	
+	docker compose exec db bash -c 'psql -h localhost -p 5432 -U docker -d laravel_development'
 redis:
 	docker compose exec redis redis-cli
 ide-helper:

@@ -23,9 +23,9 @@ services:
         volume:
           nocopy: true
     environment:
-      - DB_CONNECTION=mysql
+      - DB_CONNECTION=pgsql
       - DB_HOST=db
-      - DB_PORT=3306
+      - DB_PORT=5432
       - DB_DATABASE=${DB_NAME:-laravel_local}
       - DB_USERNAME=${DB_USER:-phper}
       - DB_PASSWORD=${DB_PASS:-secret}
@@ -49,37 +49,42 @@ services:
         source: ./src
         target: /work/src
 
+  # db:
+  #   build:
+  #     context: .
+  #     dockerfile: ./docker/mysql/Dockerfile
+  #   ports:
+  #     - target: 3306
+  #       published: ${DB_PORT:-3306}
+  #       protocol: tcp
+  #       mode: host
+  #   volumes:
+  #     - type: volume
+  #       source: db-store
+  #       target: /var/lib/mysql
+  #       volume:
+  #         nocopy: true
+  #   environment:
+  #     - MYSQL_DATABASE=${DB_NAME:-laravel_local}
+  #     - MYSQL_USER=${DB_USER:-phper}
+  #     - MYSQL_PASSWORD=${DB_PASS:-secret}
+  #     - MYSQL_ROOT_PASSWORD=${DB_PASS:-secret}
+  # for image postgres
   db:
-    build:
-      context: .
-      dockerfile: ./docker/mysql/Dockerfile
-    ports:
-      - target: 3306
-        published: ${DB_PORT:-3306}
-        protocol: tcp
-        mode: host
+    image: postgres:9.6
+    container_name: db
+    environment:
+      TZ: 'Asia/Tokyo'
+      POSTGRES_USER: 'docker'
+      POSTGRES_PASSWORD: 'docker'
+      POSTGRES_DB: 'laravel_development'
     volumes:
       - type: volume
         source: db-store
-        target: /var/lib/mysql
+        target: /var/lib/postgresql/data
         volume:
-          nocopy: true
-    environment:
-      - MYSQL_DATABASE=${DB_NAME:-laravel_local}
-      - MYSQL_USER=${DB_USER:-phper}
-      - MYSQL_PASSWORD=${DB_PASS:-secret}
-      - MYSQL_ROOT_PASSWORD=${DB_PASS:-secret}
-  # for image postgres
-  # db:
-  #   image: postgres:11
-  #   container_name: db
-  #   environment:
-  #     TZ: 'Asia/Tokyo'
-  #     POSTGRES_USER: 'docker'
-  #     POSTGRES_PASSWORD: 'docker'
-  #     POSTGRES_DB: 'laravel_development'
-  #   volumes:
-  #     - ./docker/db/data:/var/lib/postgresql/data
-  #     - ./docker/db/sql:/docker-entrypoint-initdb.d
-  #   ports:
-  #     - 5432:5432
+            nocopy: true
+      # - ./docker/db/data:/var/lib/postgresql/data
+      # - ./docker/db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
