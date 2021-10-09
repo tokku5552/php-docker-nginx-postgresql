@@ -1,9 +1,9 @@
-# docker-laravel 🐳
+# php-docker-nginx-postgresql
 
-![License](https://img.shields.io/github/license/ucan-lab/docker-laravel?color=f05340)
+<!-- ![License](https://img.shields.io/github/license/ucan-lab/docker-laravel?color=f05340)
 ![Stars](https://img.shields.io/github/stars/ucan-lab/docker-laravel?color=f05340)
 ![Issues](https://img.shields.io/github/issues/ucan-lab/docker-laravel?color=f05340)
-![Forks](https://img.shields.io/github/forks/ucan-lab/docker-laravel?color=f05340)
+![Forks](https://img.shields.io/github/forks/ucan-lab/docker-laravel?color=f05340) -->
 
 ## Introduction
 
@@ -12,8 +12,8 @@ Build a simple laravel development environment with docker-compose.
 ## Usage
 
 ```bash
-$ git clone git@github.com:ucan-lab/docker-laravel.git
-$ cd docker-laravel
+$ git clone git@github.com:tokku5552/php-docker-nginx-postgresql.git
+$ cd php-docker-nginx-postgresql
 $ make create-project # Install the latest Laravel project
 $ make install-recommend-packages # Optional
 ```
@@ -22,8 +22,7 @@ http://localhost
 
 ## Tips
 
-- Read this [Makefile](https://github.com/ucan-lab/docker-laravel/blob/main/Makefile).
-- Read this [Wiki](https://github.com/ucan-lab/docker-laravel/wiki).
+- Read this [Makefile](https://github.com/tokku5552/php-docker-nginx-postgresql/blob/main/Makefile).
 
 ## Container structures
 
