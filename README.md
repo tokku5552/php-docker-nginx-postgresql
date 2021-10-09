@@ -24,6 +24,54 @@ http://localhost
 ## Tips
 
 - Read this [Makefile](https://github.com/tokku5552/php-docker-nginx-postgresql/blob/main/Makefile).
+- [最強のLaravel開発環境をDockerを使って構築する](https://qiita.com/ucan-lab/items/5fc1281cd8076c8ac9f4#%E5%9F%BA%E6%9C%AC)
+
+- コンテナを作成する
+```
+make up
+``` 
+
+- コンテナを破棄する
+```
+make down
+```
+
+- コンテナを再作成する
+```
+make restart
+```
+
+- コンテナ、イメージ、ボリュームを破棄する
+```
+make destroy
+```
+
+- コンテナ、ボリュームを破棄する
+```
+make destroy-volumes
+```
+
+- コンテナ、イメージ、ボリュームを破棄して再構築
+```
+make remake
+```
+
+- appコンテナに入る
+```
+make app
+```
+
+- webコンテナに入る
+```
+make web
+```
+
+- dbコンテナに入る
+```
+make db
+```
+
+- dbコンテナのMySQLに接続する
 
 ## Container structures
 
@@ -35,17 +83,14 @@ http://localhost
 
 ### app container
 
-- Base image
-  - [php](https://hub.docker.com/_/php):8.0-fpm-bullseye
-  - [composer](https://hub.docker.com/_/composer):2.1
+- [php](https://hub.docker.com/_/php):8.0-fpm-bullseye
+- [composer](https://hub.docker.com/_/composer):2.1
 
 ### web container
 
-- Base image
-  - [nginx](https://hub.docker.com/_/nginx):1.20-alpine
-  - [node](https://hub.docker.com/_/node):16-alpine
+- [nginx](https://hub.docker.com/_/nginx):1.20-alpine
+- [node](https://hub.docker.com/_/node):16-alpine
 
 ### db container
 
-- Base image
-  - [mysql/mysql-server](https://hub.docker.com/r/mysql/mysql-server):8.0
+- [mysql/mysql-server](https://hub.docker.com/r/mysql/mysql-server):8.0

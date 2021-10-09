@@ -7,7 +7,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: ./infra/docker/php/Dockerfile
+      dockerfile: ./docker/php/Dockerfile
     volumes:
       - type: volume
         source: php-fpm-socket
@@ -15,8 +15,8 @@ services:
         volume:
           nocopy: true
       - type: bind
-        source: ./backend
-        target: /work/backend
+        source: ./src
+        target: /work/src
       - type: volume
         source: psysh-store
         target: /root/.config/psysh
@@ -33,7 +33,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: ./infra/docker/nginx/Dockerfile
+      dockerfile: ./docker/nginx/Dockerfile
     ports:
       - target: 80
         published: ${WEB_PORT:-80}
@@ -46,13 +46,13 @@ services:
         volume:
           nocopy: true
       - type: bind
-        source: ./backend
-        target: /work/backend
+        source: ./src
+        target: /work/src
 
   db:
     build:
       context: .
-      dockerfile: ./infra/docker/mysql/Dockerfile
+      dockerfile: ./docker/mysql/Dockerfile
     ports:
       - target: 3306
         published: ${DB_PORT:-3306}
