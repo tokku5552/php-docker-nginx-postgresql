@@ -1,5 +1,8 @@
 AWSTemplateFormatVersion: 2010-09-09
 Resources:
+  # ------------------------------------------------------------#
+  #  VPC
+  # ------------------------------------------------------------#
   LaravelVPCfromCFn:
     Type: AWS::EC2::VPC
     Properties:
@@ -8,15 +11,48 @@ Resources:
       Tags:
         - Key: Name
           Value: LaravelVPCfromCFn
+  # ------------------------------------------------------------#
+  #  Subnet
+  # ------------------------------------------------------------#
   LaravelWeb1Subnet:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: "ap-northeast-1a"
       VpcId: !Ref LaravelVPCfromCFn
-      CidrBlock: 10.0.1.0/24
+      CidrBlock: !Select [1, !Cidr [!GetAtt LaravelVPCfromCFn.CidrBlock, 2, 8]]
       Tags:
         - Key: Name
           Value: LaravelWeb1Subnet
+  LaravelWeb2Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1c"
+      VpcId: !Ref LaravelVPCfromCFn
+      CidrBlock: !Select [2, !Cidr [!GetAtt LaravelVPCfromCFn.CidrBlock, 3, 8]]
+      Tags:
+        - Key: Name
+          Value: LaravelWeb2Subnet
+  LaravelRDS1Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1a"
+      VpcId: !Ref LaravelVPCfromCFn
+      CidrBlock: !Select [3, !Cidr [!GetAtt LaravelVPCfromCFn.CidrBlock, 4, 8]]
+      Tags:
+        - Key: Name
+          Value: LaravelRDS1Subnet
+  LaravelRDS2Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1c"
+      VpcId: !Ref LaravelVPCfromCFn
+      CidrBlock: !Select [4, !Cidr [!GetAtt LaravelVPCfromCFn.CidrBlock, 5, 8]]
+      Tags:
+        - Key: Name
+          Value: LaravelRDS2Subnet
+  # ------------------------------------------------------------#
+  #  SecurityGroup
+  # ------------------------------------------------------------#
   LaravelWebSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -31,12 +67,46 @@ Resources:
       Tags:
         - Key: Name
           Value: LaravelWebSG
+  LaravelRDSSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: LaravelRDSSG
+      GroupDescription: LaravelRDSSG-Description
+      VpcId: !Ref LaravelVPCfromCFn
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: !Select [1, !Cidr [!GetAtt LaravelVPCfromCFn.CidrBlock, 2, 8]]
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: !Select [2, !Cidr [!GetAtt LaravelVPCfromCFn.CidrBlock, 3, 8]]
+      Tags:
+        - Key: Name
+          Value: LaravelRDSSG
 Outputs:
   LaravelWeb1Subnet:
     Value: !Ref LaravelWeb1Subnet
     Export:
       Name: LaravelWeb1Subnet
+  LaravelWeb2Subnet:
+    Value: !Ref LaravelWeb2Subnet
+    Export:
+      Name: LaravelWeb2Subnet
+  LaravelRDS1Subnet:
+    Value: !Ref LaravelRDS1Subnet
+    Export:
+      Name: LaravelRDS1Subnet
+  LaravelRDS2Subnet:
+    Value: !Ref LaravelRDS2Subnet
+    Export:
+      Name: LaravelRDS2Subnet
   LaravelWebSG:
     Value: !Ref LaravelWebSG
     Export:
       Name: Laravel-Web-SG
+  LaravelRDSSG:
+    Value: !Ref LaravelRDSSG
+    Export:
+      Name: Laravel-RDS-SG

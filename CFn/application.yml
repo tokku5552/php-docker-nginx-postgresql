@@ -1,10 +1,12 @@
 AWSTemplateFormatVersion: 2010-09-09
 Resources:
+  # ------------------------------------------------------------#
+  #  EC2
+  # ------------------------------------------------------------#
   LaravelWeb1:
     Type: AWS::EC2::Instance
     Properties:
-      KeyName: MyKeyPair
-      DisableApiTermination:
+      KeyName: MyKeypair
       ImageId: ami-0218d08a1f9dac831
       InstanceType: t2.micro
       Monitoring: false
@@ -14,41 +16,47 @@ Resources:
       Tags:
         - Key: Name
           Value: LaravelWeb1
-  rdsDBInstance:
+  LaravelWeb2:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: MyKeypair
+      ImageId: ami-0218d08a1f9dac831
+      InstanceType: t2.micro
+      Monitoring: false
+      SecurityGroupIds:
+        - !ImportValue Laravel-Web-SG
+      SubnetId: !ImportValue LaravelWeb2Subnet
+      Tags:
+        - Key: Name
+          Value: LaravelWeb2
+  # ------------------------------------------------------------#
+  #  RDS
+  # ------------------------------------------------------------#
+  LaravelRDS:
     Type: AWS::RDS::DBInstance
     Properties:
-      AllocatedStorage:
-      DBInstanceClass:
-      AllowMajorVersionUpgrade: true|false
-      AutoMinorVersionUpgrade: true|false
-      AvailabilityZone:
-      BackupRetentionPeriod:
-      CharacterSetName:
-      DBInstanceIdentifier:
-      DBName:
-      DBParameterGroupName:
+      Engine: mysql
+      EngineVersion: 5.7
+      DBInstanceClass: db.t2.micro
+      StorageType: gp2
+      AllocatedStorage: 10
+      MasterUsername: root
+      DBName: laravel
+      MasterUserPassword: !Sub ${!DB_PASSWORD}
       DBSecurityGroups:
-        - db-sg-group
-      DBSnapshotIdentifier:
-      DBSubnetGroupName:
-      Engine: mysql|oracle
-      EngineVersion:
-      Iops:
-      KmsKeyId:
-      LicenseModel:
-      MasterUsername:
-      MasterUserPassword:
-      MultiAZ: true|false
-      OptionGroupName:
-      Port:
-      PreferredBackupWindow:
-      PreferredMaintenanceWindow:
-      PubliclyAccessible: true|false
-      SourceDBInstanceIdentifier:
-      StorageEncrypted: true|false
-      StorageType:
-      VPCSecurityGroups:
-        - vpc-sg-id
+        - !ImportValue Laravel-RDS-SG
+      MultiAZ: false
+      AvailabilityZone: !Sub ${AWS::Region}a
       Tags:
-        - Key: keyname
-          Value: value
+        - Key: Name
+          Value: LaravelRDS
+  LaravelRDSSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: LaravelRDSSubnetGroup
+      SubnetIds:
+        - !ImportValue LaravelRDS1Subnet
+        - !ImportValue LaravelRDS2Subnet
+      Tags:
+        - Key: Name
+          Value: LaravelRDSSubnetGroup
