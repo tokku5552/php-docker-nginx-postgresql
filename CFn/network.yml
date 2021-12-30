@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  LaravelVPCfromCFn:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/21
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: LaravelVPCfromCFn
+  LaravelWeb1Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1a"
+      VpcId: !Ref LaravelVPCfromCFn
+      CidrBlock: 10.0.1.0/24
+      Tags:
+        - Key: Name
+          Value: LaravelWeb1Subnet
+  LaravelWebSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: LaravelWebSG
+      GroupDescription: LaravelWebSG-Description
+      VpcId: !Ref LaravelVPCfromCFn
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: LaravelWebSG
+Outputs:
+  LaravelWeb1Subnet:
+    Value: !Ref LaravelWeb1Subnet
+    Export:
+      Name: LaravelWeb1Subnet
+  LaravelWebSG:
+    Value: !Ref LaravelWebSG
+    Export:
+      Name: Laravel-Web-SG

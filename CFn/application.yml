@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  LaravelWeb1:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: MyKeyPair
+      DisableApiTermination:
+      ImageId: ami-0218d08a1f9dac831
+      InstanceType: t2.micro
+      Monitoring: false
+      SecurityGroupIds:
+        - !ImportValue Laravel-Web-SG
+      SubnetId: !ImportValue LaravelWeb1Subnet
+      Tags:
+        - Key: Name
+          Value: LaravelWeb1
+  rdsDBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage:
+      DBInstanceClass:
+      AllowMajorVersionUpgrade: true|false
+      AutoMinorVersionUpgrade: true|false
+      AvailabilityZone:
+      BackupRetentionPeriod:
+      CharacterSetName:
+      DBInstanceIdentifier:
+      DBName:
+      DBParameterGroupName:
+      DBSecurityGroups:
+        - db-sg-group
+      DBSnapshotIdentifier:
+      DBSubnetGroupName:
+      Engine: mysql|oracle
+      EngineVersion:
+      Iops:
+      KmsKeyId:
+      LicenseModel:
+      MasterUsername:
+      MasterUserPassword:
+      MultiAZ: true|false
+      OptionGroupName:
+      Port:
+      PreferredBackupWindow:
+      PreferredMaintenanceWindow:
+      PubliclyAccessible: true|false
+      SourceDBInstanceIdentifier:
+      StorageEncrypted: true|false
+      StorageType:
+      VPCSecurityGroups:
+        - vpc-sg-id
+      Tags:
+        - Key: keyname
+          Value: value
