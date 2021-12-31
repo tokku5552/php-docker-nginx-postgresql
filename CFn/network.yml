@@ -118,6 +118,51 @@ Resources:
       Tags:
         - Key: Name
           Value: LaravelRDSSG
+  # ------------------------------------------------------------#
+  #  RouteTable
+  # ------------------------------------------------------------#
+  LaravelWeb1SubnetRouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref LaravelVPCfromCFn
+      Tags:
+        - Key: Name
+          Value: LaravelWeb1SubnetRouteTable
+  LaravelWeb2SubnetRouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref LaravelVPCfromCFn
+      Tags:
+        - Key: Name
+          Value: LaravelWeb2SubnetRouteTable
+  # ------------------------------------------------------------#
+  # Routing
+  # ------------------------------------------------------------#
+  LaravelWeb1SubnetRoute:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: !Ref LaravelWeb1SubnetRouteTable
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref LaravelInternetGateway
+  LaravelWeb2SubnetRoute:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: !Ref LaravelWeb2SubnetRouteTable
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref LaravelInternetGateway
+  # ------------------------------------------------------------#
+  # RouteTable Associate
+  # ------------------------------------------------------------#
+  LaravelWeb1SubnetRouteAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref LaravelWeb1Subnet
+      RouteTableId: !Ref LaravelWeb1SubnetRouteTable
+  LaravelWeb2SubnetRouteAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref LaravelWeb2Subnet
+      RouteTableId: !Ref LaravelWeb2SubnetRouteTable
 Outputs:
   LaravelVPCfromCFn:
     Value: !Ref LaravelVPCfromCFn

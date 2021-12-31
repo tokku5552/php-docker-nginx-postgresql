@@ -96,6 +96,27 @@ Resources:
         - Key: Name
           Value: LaravelWeb2
   # ------------------------------------------------------------#
+  #  ElasticIP
+  # ------------------------------------------------------------#
+  LaravelWeb1EIP:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: vpc
+  LaravelWeb1EIPAssociate:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: !GetAtt LaravelWeb1EIP.AllocationId
+      InstanceId: !Ref LaravelWeb1
+  LaravelWeb2EIP:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: vpc
+  LaravelWeb2EIPAssociate:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: !GetAtt LaravelWeb2EIP.AllocationId
+      InstanceId: !Ref LaravelWeb2
+  # ------------------------------------------------------------#
   #  RDS
   # ------------------------------------------------------------#
   LaravelRDS:
