@@ -35,6 +35,7 @@ Resources:
   LaravelRDS:
     Type: AWS::RDS::DBInstance
     Properties:
+      DBInstanceIdentifier: LaravelRDS
       Engine: mysql
       EngineVersion: 5.7
       DBInstanceClass: db.t2.micro
@@ -43,8 +44,9 @@ Resources:
       MasterUsername: root
       DBName: laravel
       MasterUserPassword: !Sub ${!DB_PASSWORD}
-      DBSecurityGroups:
+      VPCSecurityGroups:
         - !ImportValue Laravel-RDS-SG
+      DBSubnetGroupName: !Ref LaravelRDSSubnetGroup
       MultiAZ: false
       AvailabilityZone: !Sub ${AWS::Region}a
       Tags:
