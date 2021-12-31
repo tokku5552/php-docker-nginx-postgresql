@@ -1,6 +1,72 @@
 AWSTemplateFormatVersion: 2010-09-09
 Resources:
   # ------------------------------------------------------------#
+  #  TargetGroup
+  # ------------------------------------------------------------#
+  LaravelTargetGroup:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      VpcId: !ImportValue LaravelVPC
+      Name: LaravelTargetGroup
+      Protocol: HTTP
+      Port: 80
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: "/"
+      HealthCheckPort: "traffic-port"
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      HealthCheckTimeoutSeconds: 5
+      HealthCheckIntervalSeconds: 10
+      Matcher:
+        HttpCode: 200
+      Tags:
+        - Key: Name
+          Value: LaravelTargetGroup
+      TargetGroupAttributes:
+        - Key: "deregistration_delay.timeout_seconds"
+          Value: 300
+        - Key: "stickiness.enabled"
+          Value: false
+        - Key: "stickiness.type"
+          Value: lb_cookie
+        - Key: "stickiness.lb_cookie.duration_seconds"
+          Value: 86400
+      Targets:
+        - Id: !Ref LaravelWeb1
+          Port: 80
+        - Id: !Ref LaravelWeb2
+          Port: 80
+  # ------------------------------------------------------------#
+  #  Internet ALB
+  # ------------------------------------------------------------#
+  LaravelALB:
+    Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    Properties:
+      Name: LaravelALB
+      Tags:
+        - Key: Name
+          Value: LaravelALB
+      Scheme: "internet-facing"
+      LoadBalancerAttributes:
+        - Key: "deletion_protection.enabled"
+          Value: false
+        - Key: "idle_timeout.timeout_seconds"
+          Value: 60
+      SecurityGroups:
+        - !ImportValue Laravel-ALB-SG
+      Subnets:
+        - !ImportValue LaravelWeb1Subnet
+        - !ImportValue LaravelWeb2Subnet
+  ALBListener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref LaravelTargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref LaravelALB
+      Port: 80
+      Protocol: HTTP
+  # ------------------------------------------------------------#
   #  EC2
   # ------------------------------------------------------------#
   LaravelWeb1:

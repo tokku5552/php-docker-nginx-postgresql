@@ -11,6 +11,17 @@ Resources:
       Tags:
         - Key: Name
           Value: LaravelVPCfromCFn
+  LaravelInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: LaravelInternetGateway
+  LaravelAttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref LaravelVPCfromCFn
+      InternetGatewayId: !Ref LaravelInternetGateway
   # ------------------------------------------------------------#
   #  Subnet
   # ------------------------------------------------------------#
@@ -53,6 +64,24 @@ Resources:
   # ------------------------------------------------------------#
   #  SecurityGroup
   # ------------------------------------------------------------#
+  LaravelALBSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: LaravelALBSG
+      GroupDescription: LaravelALBSG-Description
+      VpcId: !Ref LaravelVPCfromCFn
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: LaravelALBSG
   LaravelWebSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -63,6 +92,10 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
@@ -86,6 +119,10 @@ Resources:
         - Key: Name
           Value: LaravelRDSSG
 Outputs:
+  LaravelVPCfromCFn:
+    Value: !Ref LaravelVPCfromCFn
+    Export:
+      Name: LaravelVPC
   LaravelWeb1Subnet:
     Value: !Ref LaravelWeb1Subnet
     Export:
@@ -102,6 +139,10 @@ Outputs:
     Value: !Ref LaravelRDS2Subnet
     Export:
       Name: LaravelRDS2Subnet
+  LaravelALBSG:
+    Value: !Ref LaravelALBSG
+    Export:
+      Name: Laravel-ALB-SG
   LaravelWebSG:
     Value: !Ref LaravelWebSG
     Export:
