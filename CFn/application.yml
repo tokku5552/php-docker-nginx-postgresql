@@ -128,8 +128,8 @@ Resources:
       DBInstanceClass: db.t2.micro
       StorageType: gp2
       AllocatedStorage: 10
-      MasterUsername: root
-      DBName: laravel
+      MasterUsername: !Sub ${!DB_USERNAME}
+      DBName: !Sub ${!DB_DATABASE}
       MasterUserPassword: !Sub ${!DB_PASSWORD}
       VPCSecurityGroups:
         - !ImportValue Laravel-RDS-SG
