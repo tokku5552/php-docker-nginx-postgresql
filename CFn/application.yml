@@ -76,9 +76,12 @@ Resources:
       ImageId: ami-0218d08a1f9dac831
       InstanceType: t2.micro
       Monitoring: false
-      SecurityGroupIds:
-        - !ImportValue Laravel-Web-SG
-      SubnetId: !ImportValue LaravelWeb1Subnet
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: !ImportValue LaravelWeb1Subnet
+          GroupSet:
+            - !ImportValue Laravel-Web-SG
       Tags:
         - Key: Name
           Value: LaravelWeb1
@@ -89,36 +92,27 @@ Resources:
       ImageId: ami-0218d08a1f9dac831
       InstanceType: t2.micro
       Monitoring: false
-      SecurityGroupIds:
-        - !ImportValue Laravel-Web-SG
-      SubnetId: !ImportValue LaravelWeb2Subnet
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: !ImportValue LaravelWeb2Subnet
+          GroupSet:
+            - !ImportValue Laravel-Web-SG
       Tags:
         - Key: Name
           Value: LaravelWeb2
   # ------------------------------------------------------------#
-  #  ElasticIP
-  # ------------------------------------------------------------#
-  LaravelWeb1EIP:
-    Type: "AWS::EC2::EIP"
-    Properties:
-      Domain: vpc
-  LaravelWeb1EIPAssociate:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      AllocationId: !GetAtt LaravelWeb1EIP.AllocationId
-      InstanceId: !Ref LaravelWeb1
-  LaravelWeb2EIP:
-    Type: "AWS::EC2::EIP"
-    Properties:
-      Domain: vpc
-  LaravelWeb2EIPAssociate:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      AllocationId: !GetAtt LaravelWeb2EIP.AllocationId
-      InstanceId: !Ref LaravelWeb2
-  # ------------------------------------------------------------#
   #  RDS
   # ------------------------------------------------------------#
+  LaravelRDSSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: LaravelRDSSecret
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "root"}'
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\'
   LaravelRDS:
     Type: AWS::RDS::DBInstance
     Properties:
@@ -128,9 +122,9 @@ Resources:
       DBInstanceClass: db.t2.micro
       StorageType: gp2
       AllocatedStorage: 10
-      MasterUsername: !Sub ${!DB_USERNAME}
-      DBName: !Sub ${!DB_DATABASE}
-      MasterUserPassword: !Sub ${!DB_PASSWORD}
+      MasterUsername: !Sub "{{resolve:secretsmanager:${LaravelRDSSecret}:SecretString:username}}"
+      DBName: laravel
+      MasterUserPassword: !Sub "{{resolve:secretsmanager:${LaravelRDSSecret}:SecretString:password}}"
       VPCSecurityGroups:
         - !ImportValue Laravel-RDS-SG
       DBSubnetGroupName: !Ref LaravelRDSSubnetGroup
@@ -139,6 +133,12 @@ Resources:
       Tags:
         - Key: Name
           Value: LaravelRDS
+  LaravelRDSSecretInstanceAttachment:
+    Type: "AWS::SecretsManager::SecretTargetAttachment"
+    Properties:
+      SecretId: !Ref LaravelRDSSecret
+      TargetId: !Ref LaravelRDS
+      TargetType: AWS::RDS::DBInstance
   LaravelRDSSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
