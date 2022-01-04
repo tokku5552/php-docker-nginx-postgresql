@@ -8,7 +8,7 @@ cd CFn
 aws cloudformation deploy --template-file network.yml --stack-name LaravelNetwork
 
 # ApplicationStack
-aws cloudformation deploy --template-file application.yml --stack-name LaravelApplication --parameter-overrides $(cat ../src/.env)
+aws cloudformation deploy --template-file application.yml --stack-name LaravelApplication
 ```
 
 - delete Stack with AWSCLI

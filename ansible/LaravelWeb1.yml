@@ -1,0 +1,6 @@
+# LaravelWeb1 setup file
+
+- name: deploy gitlab
+  hosts: LaravelWeb1
+  roles:
+    - cloudwatch
