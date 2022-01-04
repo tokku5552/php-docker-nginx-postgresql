@@ -1,0 +1,4 @@
+- include: install_php.yml
+- include: install_composer.yml
+- include: install_nginx.yml
+- include: install_others.yml

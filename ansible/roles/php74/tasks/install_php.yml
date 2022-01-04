@@ -1,0 +1,26 @@
+- name: yum update
+  yum:
+    name: "*"
+    state: latest
+
+- name: enable php7.4
+  shell: |
+    amazon-linux-extras enable php7.4
+
+- name: install_php
+  yum:
+    name:
+      - php-cli
+      - php-pdo
+      - php-fpm
+      - php-json
+      - php-mysqlnd
+      - php-bcmath
+      - php-mbstring
+      - php-xml
+    state: present
+
+- name: restart php-fpm
+  service:
+    name: php-fpm
+    state: restarted

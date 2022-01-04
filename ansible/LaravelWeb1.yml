@@ -2,5 +2,6 @@
 
 - name: deploy gitlab
   hosts: LaravelWeb1
+  become: true
   roles:
-    - cloudwatch
+    - php74
