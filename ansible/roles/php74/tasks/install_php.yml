@@ -24,3 +24,33 @@
   service:
     name: php-fpm
     state: restarted
+
+- name: setting php-fpm user
+  lineinfile:
+    path: /etc/php-fpm.d/www.conf
+    regexp: "^user = "
+    line: "user = nginx"
+
+- name: setting php-fpm group
+  lineinfile:
+    path: /etc/php-fpm.d/www.conf
+    regexp: "^group = "
+    line: "group = nginx"
+
+- name: setting php-fpm listen.owner
+  lineinfile:
+    path: /etc/php-fpm.d/www.conf
+    regexp: "^listen.owner ="
+    line: "listen.owner = nginx"
+
+- name: setting php-fpm listen.group
+  lineinfile:
+    path: /etc/php-fpm.d/www.conf
+    regexp: "^listen.group ="
+    line: "listen.group = nginx"
+
+- name: setting php-fpm listen.mode
+  lineinfile:
+    path: /etc/php-fpm.d/www.conf
+    regexp: "^listen.mode ="
+    line: "listen.mode = 0660"

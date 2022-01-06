@@ -1,8 +1,15 @@
 [LaravelWeb1]
 18.183.126.192
 
+[LaravelWeb2]
+54.92.127.85
+
 [LaravelWeb1:vars]
 ansible_port=22
 ansible_user=ec2-user
 ansible_ssh_private_key_file=MyKeypair.pem
 
+[LaravelWeb2:vars]
+ansible_port=22
+ansible_user=ec2-user
+ansible_ssh_private_key_file=MyKeypair.pem

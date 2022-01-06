@@ -23,12 +23,12 @@ logs:
 bash:
 	docker compose exec ansible-container bash
 check:
-	docker compose exec ansible-container bash -c 'ansible-playbook -i inventory.txt setup.yml --syntax-check'
+	docker compose exec ansible-container bash -c 'ansible-playbook -i inventory.txt site.yml --syntax-check'
 run:
-	docker compose exec ansible-container bash -c './logs/0_rotate.sh;ansible-playbook -i inventory.txt setup.yml'
+	docker compose exec ansible-container bash -c 'ansible-playbook -i inventory.txt site.yml'
 run-v:
-	docker compose exec ansible-container bash -c './logs/0_rotate.sh;ansible-playbook -v -i inventory.txt setup.yml'
+	docker compose exec ansible-container bash -c './logs/0_rotate.sh;ansible-playbook -v -i inventory.txt site.yml'
 run-vvv:
-	docker compose exec ansible-container bash -c './logs/0_rotate.sh;ansible-playbook -vvv -i inventory.txt setup.yml'
+	docker compose exec ansible-container bash -c './logs/0_rotate.sh;ansible-playbook -vvv -i inventory.txt site.yml'
 dry-run:
-	docker compose exec ansible-container bash -c './logs/0_rotate.sh;ansible-playbook -i inventory.txt setup.yml -C'
+	docker compose exec ansible-container bash -c 'ansible-playbook -i inventory.txt site.yml -C'
