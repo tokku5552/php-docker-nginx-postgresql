@@ -15,9 +15,9 @@ aws cloudformation deploy --template-file application.yml --stack-name LaravelAp
 ```bash:
 cd CFn
 
-# NetworkStack
-aws cloudformation delete-stack --stack-name LaravelNetwork
-
 # ApplicationStack
 aws cloudformation delete-stack --stack-name LaravelApplication
+
+# NetworkStack
+aws cloudformation delete-stack --stack-name LaravelNetwork
 ```

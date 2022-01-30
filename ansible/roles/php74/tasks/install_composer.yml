@@ -12,6 +12,9 @@
     remote_src: yes
     src: /home/ec2-user/composer.phar
     dest: /usr/local/bin/composer
+    owner: ec2-user
+    group: ec2-user
+    mode: 0755
 
 - name: Remove old file
   file:
