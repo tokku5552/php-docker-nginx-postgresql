@@ -1,0 +1,28 @@
+- name: enable nginx1
+  shell: |
+    amazon-linux-extras enable nginx1
+
+- name: install nginx
+  yum:
+    name:
+      - nginx
+    state: present
+
+- name: create document root
+  file:
+    path: /var/www/
+    state: directory
+    owner: root
+    group: root
+    mode: 0777
+
+- name: setting nginx
+  copy:
+    src: nginx.conf
+    dest: /etc/nginx/nginx.conf
+
+- name: restart & enable nginx
+  systemd:
+    name: nginx
+    state: restarted
+    enabled: yes

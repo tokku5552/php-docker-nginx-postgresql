@@ -1,0 +1,8 @@
+version: "3"
+services:
+  ansible-container:
+    build: ansible-container
+    container_name: ansible-container
+    tty: true
+    volumes:
+      - .:/workdir

@@ -1,0 +1,3 @@
+# master setup file
+
+- import_playbook: laravel_web.yml

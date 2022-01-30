@@ -1,0 +1,198 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  # ------------------------------------------------------------#
+  #  VPC
+  # ------------------------------------------------------------#
+  LaravelVPCfromCFn:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/21
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: LaravelVPCfromCFn
+  LaravelInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: LaravelInternetGateway
+  LaravelAttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref LaravelVPCfromCFn
+      InternetGatewayId: !Ref LaravelInternetGateway
+  # ------------------------------------------------------------#
+  #  Subnet
+  # ------------------------------------------------------------#
+  LaravelWeb1Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1a"
+      VpcId: !Ref LaravelVPCfromCFn
+      CidrBlock: !Select [1, !Cidr [!GetAtt LaravelVPCfromCFn.CidrBlock, 2, 8]]
+      Tags:
+        - Key: Name
+          Value: LaravelWeb1Subnet
+  LaravelWeb2Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1c"
+      VpcId: !Ref LaravelVPCfromCFn
+      CidrBlock: !Select [2, !Cidr [!GetAtt LaravelVPCfromCFn.CidrBlock, 3, 8]]
+      Tags:
+        - Key: Name
+          Value: LaravelWeb2Subnet
+  LaravelRDS1Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1a"
+      VpcId: !Ref LaravelVPCfromCFn
+      CidrBlock: !Select [3, !Cidr [!GetAtt LaravelVPCfromCFn.CidrBlock, 4, 8]]
+      Tags:
+        - Key: Name
+          Value: LaravelRDS1Subnet
+  LaravelRDS2Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1c"
+      VpcId: !Ref LaravelVPCfromCFn
+      CidrBlock: !Select [4, !Cidr [!GetAtt LaravelVPCfromCFn.CidrBlock, 5, 8]]
+      Tags:
+        - Key: Name
+          Value: LaravelRDS2Subnet
+  # ------------------------------------------------------------#
+  #  SecurityGroup
+  # ------------------------------------------------------------#
+  LaravelALBSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: LaravelALBSG
+      GroupDescription: LaravelALBSG-Description
+      VpcId: !Ref LaravelVPCfromCFn
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: LaravelALBSG
+  LaravelWebSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: LaravelWebSG
+      GroupDescription: LaravelWebSG-Description
+      VpcId: !Ref LaravelVPCfromCFn
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: LaravelWebSG
+  LaravelRDSSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: LaravelRDSSG
+      GroupDescription: LaravelRDSSG-Description
+      VpcId: !Ref LaravelVPCfromCFn
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: !Select [1, !Cidr [!GetAtt LaravelVPCfromCFn.CidrBlock, 2, 8]]
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: !Select [2, !Cidr [!GetAtt LaravelVPCfromCFn.CidrBlock, 3, 8]]
+      Tags:
+        - Key: Name
+          Value: LaravelRDSSG
+  # ------------------------------------------------------------#
+  #  RouteTable
+  # ------------------------------------------------------------#
+  LaravelWeb1SubnetRouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref LaravelVPCfromCFn
+      Tags:
+        - Key: Name
+          Value: LaravelWeb1SubnetRouteTable
+  LaravelWeb2SubnetRouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref LaravelVPCfromCFn
+      Tags:
+        - Key: Name
+          Value: LaravelWeb2SubnetRouteTable
+  # ------------------------------------------------------------#
+  # Routing
+  # ------------------------------------------------------------#
+  LaravelWeb1SubnetRoute:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: !Ref LaravelWeb1SubnetRouteTable
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref LaravelInternetGateway
+  LaravelWeb2SubnetRoute:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: !Ref LaravelWeb2SubnetRouteTable
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref LaravelInternetGateway
+  # ------------------------------------------------------------#
+  # RouteTable Associate
+  # ------------------------------------------------------------#
+  LaravelWeb1SubnetRouteAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref LaravelWeb1Subnet
+      RouteTableId: !Ref LaravelWeb1SubnetRouteTable
+  LaravelWeb2SubnetRouteAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref LaravelWeb2Subnet
+      RouteTableId: !Ref LaravelWeb2SubnetRouteTable
+Outputs:
+  LaravelVPCfromCFn:
+    Value: !Ref LaravelVPCfromCFn
+    Export:
+      Name: LaravelVPC
+  LaravelWeb1Subnet:
+    Value: !Ref LaravelWeb1Subnet
+    Export:
+      Name: LaravelWeb1Subnet
+  LaravelWeb2Subnet:
+    Value: !Ref LaravelWeb2Subnet
+    Export:
+      Name: LaravelWeb2Subnet
+  LaravelRDS1Subnet:
+    Value: !Ref LaravelRDS1Subnet
+    Export:
+      Name: LaravelRDS1Subnet
+  LaravelRDS2Subnet:
+    Value: !Ref LaravelRDS2Subnet
+    Export:
+      Name: LaravelRDS2Subnet
+  LaravelALBSG:
+    Value: !Ref LaravelALBSG
+    Export:
+      Name: Laravel-ALB-SG
+  LaravelWebSG:
+    Value: !Ref LaravelWebSG
+    Export:
+      Name: Laravel-Web-SG
+  LaravelRDSSG:
+    Value: !Ref LaravelRDSSG
+    Export:
+      Name: Laravel-RDS-SG

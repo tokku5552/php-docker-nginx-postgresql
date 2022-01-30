@@ -1,0 +1,7 @@
+# file: ansible/laravel_web.yml
+
+- name: setup LaravelWebServer
+  hosts: all
+  become: true
+  roles:
+    - php74

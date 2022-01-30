@@ -1,0 +1,151 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  # ------------------------------------------------------------#
+  #  TargetGroup
+  # ------------------------------------------------------------#
+  LaravelTargetGroup:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      VpcId: !ImportValue LaravelVPC
+      Name: LaravelTargetGroup
+      Protocol: HTTP
+      Port: 80
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: "/"
+      HealthCheckPort: "traffic-port"
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      HealthCheckTimeoutSeconds: 5
+      HealthCheckIntervalSeconds: 10
+      Matcher:
+        HttpCode: 200
+      Tags:
+        - Key: Name
+          Value: LaravelTargetGroup
+      TargetGroupAttributes:
+        - Key: "deregistration_delay.timeout_seconds"
+          Value: 300
+        - Key: "stickiness.enabled"
+          Value: false
+        - Key: "stickiness.type"
+          Value: lb_cookie
+        - Key: "stickiness.lb_cookie.duration_seconds"
+          Value: 86400
+      Targets:
+        - Id: !Ref LaravelWeb1
+          Port: 80
+        - Id: !Ref LaravelWeb2
+          Port: 80
+  # ------------------------------------------------------------#
+  #  Internet ALB
+  # ------------------------------------------------------------#
+  LaravelALB:
+    Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    Properties:
+      Name: LaravelALB
+      Tags:
+        - Key: Name
+          Value: LaravelALB
+      Scheme: "internet-facing"
+      LoadBalancerAttributes:
+        - Key: "deletion_protection.enabled"
+          Value: false
+        - Key: "idle_timeout.timeout_seconds"
+          Value: 60
+      SecurityGroups:
+        - !ImportValue Laravel-ALB-SG
+      Subnets:
+        - !ImportValue LaravelWeb1Subnet
+        - !ImportValue LaravelWeb2Subnet
+  ALBListener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref LaravelTargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref LaravelALB
+      Port: 80
+      Protocol: HTTP
+  # ------------------------------------------------------------#
+  #  EC2
+  # ------------------------------------------------------------#
+  LaravelWeb1:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: MyKeypair
+      ImageId: ami-0218d08a1f9dac831
+      InstanceType: t2.micro
+      Monitoring: false
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: !ImportValue LaravelWeb1Subnet
+          GroupSet:
+            - !ImportValue Laravel-Web-SG
+      Tags:
+        - Key: Name
+          Value: LaravelWeb1
+  LaravelWeb2:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: MyKeypair
+      ImageId: ami-0218d08a1f9dac831
+      InstanceType: t2.micro
+      Monitoring: false
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: !ImportValue LaravelWeb2Subnet
+          GroupSet:
+            - !ImportValue Laravel-Web-SG
+      Tags:
+        - Key: Name
+          Value: LaravelWeb2
+  # ------------------------------------------------------------#
+  #  RDS
+  # ------------------------------------------------------------#
+  LaravelRDSSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: LaravelRDSSecret
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "root"}'
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\'
+  LaravelRDS:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: LaravelRDS
+      Engine: mysql
+      EngineVersion: 5.7
+      DBInstanceClass: db.t2.micro
+      StorageType: gp2
+      AllocatedStorage: 10
+      MasterUsername: !Sub "{{resolve:secretsmanager:${LaravelRDSSecret}:SecretString:username}}"
+      DBName: laravel
+      MasterUserPassword: !Sub "{{resolve:secretsmanager:${LaravelRDSSecret}:SecretString:password}}"
+      VPCSecurityGroups:
+        - !ImportValue Laravel-RDS-SG
+      DBSubnetGroupName: !Ref LaravelRDSSubnetGroup
+      MultiAZ: false
+      AvailabilityZone: !Sub ${AWS::Region}a
+      Tags:
+        - Key: Name
+          Value: LaravelRDS
+  LaravelRDSSecretInstanceAttachment:
+    Type: "AWS::SecretsManager::SecretTargetAttachment"
+    Properties:
+      SecretId: !Ref LaravelRDSSecret
+      TargetId: !Ref LaravelRDS
+      TargetType: AWS::RDS::DBInstance
+  LaravelRDSSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: LaravelRDSSubnetGroup
+      SubnetIds:
+        - !ImportValue LaravelRDS1Subnet
+        - !ImportValue LaravelRDS2Subnet
+      Tags:
+        - Key: Name
+          Value: LaravelRDSSubnetGroup

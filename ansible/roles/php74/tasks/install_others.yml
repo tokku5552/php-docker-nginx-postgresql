@@ -1,0 +1,6 @@
+- name: install other packages
+  yum:
+    name:
+      - mysql
+      - git
+    state: present

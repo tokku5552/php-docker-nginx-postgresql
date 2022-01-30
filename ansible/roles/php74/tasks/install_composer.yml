@@ -1,0 +1,22 @@
+- name: install composer
+  shell: |
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+    php -r "if (hash_file('sha384', 'composer-setup.php') === \
+    '906a84df04cea2aa72f40b5f787e49f22d4c2f19492ac310e8cba5b96ac8b64115ac402c8cd292b8a03482574915d1a8') \
+    { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" && \
+    php composer-setup.php && \
+    php -r "unlink('composer-setup.php');"
+
+- name: move composer binary
+  copy:
+    remote_src: yes
+    src: /home/ec2-user/composer.phar
+    dest: /usr/local/bin/composer
+    owner: ec2-user
+    group: ec2-user
+    mode: 0755
+
+- name: Remove old file
+  file:
+    path: /home/ec2-user/composer.phar
+    state: absent
