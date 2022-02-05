@@ -17,6 +17,9 @@ services:
       - type: bind
         source: ./src
         target: /work/src
+      - type: bind
+        source: ~/.ssh
+        target: /root/.ssh
       - type: volume
         source: psysh-store
         target: /root/.config/psysh
@@ -83,7 +86,7 @@ services:
         source: db-store
         target: /var/lib/postgresql/data
         volume:
-            nocopy: true
+          nocopy: true
       # - ./docker/db/data:/var/lib/postgresql/data
       # - ./docker/db/sql:/docker-entrypoint-initdb.d
     ports:

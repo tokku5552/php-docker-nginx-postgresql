@@ -4,13 +4,13 @@ namespace Deployer;
 require 'recipe/laravel.php';
 
 // Project name
-set('application', 'my_project');
+set('application', 'php-docker-nginx-postgresql');
 
 // Project repository
-set('repository', '');
+// set('repository', 'git@github.com:tokku5552/php-docker-nginx-postgresql.git');
 
 // [Optional] Allocate tty for git clone. Default value is false.
-set('git_tty', true); 
+set('git_tty', false); 
 
 // Shared files/dirs between deploys 
 add('shared_files', []);
@@ -22,9 +22,11 @@ set('allow_anonymous_stats', false);
 
 // Hosts
 
-host('project.com')
-    ->set('deploy_path', '~/{{application}}');    
+// host('project.com')
+//     ->set('deploy_path', '~/{{application}}');    
     
+inventory('servers.yml');
+
 // Tasks
 
 task('build', function () {
@@ -38,3 +40,8 @@ after('deploy:failed', 'deploy:unlock');
 
 before('deploy:symlink', 'artisan:migrate');
 
+after('deploy:update_code', 'set_release_path');
+task('set_release_path',function() {
+    $newReleasePath = get('release_path') . '/src';
+  set('release_path', $newReleasePath);
+});

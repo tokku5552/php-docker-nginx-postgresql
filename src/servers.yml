@@ -1,0 +1,18 @@
+LaravelWeb1:
+  hostname: 13.112.197.49
+  stage: LaravelWeb1
+  user: ec2-user
+  port: 22
+  identityFile: ~/.ssh/MyKeypair.pem
+  deploy_path: /var/www/
+  branch: main
+  repository: https://github.com/tokku5552/php-docker-nginx-postgresql.git
+LaravelWeb2:
+  hostname: 18.181.224.249
+  stage: LaravelWeb2
+  user: ec2-user
+  port: 22
+  identityFile: ~/.ssh/MyKeypair.pem
+  deploy_path: /var/www/
+  branch: main
+  repository: https://github.com/tokku5552/php-docker-nginx-postgresql.git
