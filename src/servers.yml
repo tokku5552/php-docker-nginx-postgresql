@@ -7,6 +7,8 @@ LaravelWeb1:
   deploy_path: /var/www/
   branch: main
   repository: https://github.com/tokku5552/php-docker-nginx-postgresql.git
+  target_group_arn: arn:aws:elasticloadbalancing:ap-northeast-1:294892136588:targetgroup/LaravelTargetGroup/43da03d4197425a6
+  instance_id: i-07e4b8df05bf7fca1
 LaravelWeb2:
   hostname: 18.181.224.249
   stage: LaravelWeb2
@@ -16,3 +18,5 @@ LaravelWeb2:
   deploy_path: /var/www/
   branch: main
   repository: https://github.com/tokku5552/php-docker-nginx-postgresql.git
+  target_group_arn: arn:aws:elasticloadbalancing:ap-northeast-1:294892136588:targetgroup/LaravelTargetGroup/43da03d4197425a6
+  instance_id: i-04b45b695f79c20fd
