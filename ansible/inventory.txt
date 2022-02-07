@@ -1,8 +1,8 @@
 [LaravelWeb1]
-18.183.126.192
+13.112.197.49
 
 [LaravelWeb2]
-54.92.127.85
+18.181.224.249
 
 [LaravelWeb1:vars]
 ansible_port=22

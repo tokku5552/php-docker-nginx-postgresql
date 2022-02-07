@@ -17,11 +17,16 @@ services:
       - type: bind
         source: ./src
         target: /work/src
+      - type: bind
+        source: ~/.ssh
+        target: /root/.ssh
       - type: volume
         source: psysh-store
         target: /root/.config/psysh
         volume:
           nocopy: true
+    env_file:
+      - docker/php/.env
     environment:
       - DB_CONNECTION=pgsql
       - DB_HOST=db
@@ -29,6 +34,8 @@ services:
       - DB_DATABASE=${DB_NAME:-laravel_local}
       - DB_USERNAME=${DB_USER:-phper}
       - DB_PASSWORD=${DB_PASS:-secret}
+      - AWS_DEFAULT_REGION=ap-northeast-1
+      - AWS_DEFAULT_OUTPUT=json
 
   web:
     build:
@@ -83,7 +90,7 @@ services:
         source: db-store
         target: /var/lib/postgresql/data
         volume:
-            nocopy: true
+          nocopy: true
       # - ./docker/db/data:/var/lib/postgresql/data
       # - ./docker/db/sql:/docker-entrypoint-initdb.d
     ports:

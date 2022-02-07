@@ -81,6 +81,12 @@ make sql
 make psql
 ```
 
+- deploy
+```
+appコンテナ内で
+vendor/bin/dep deploy LaravelWeb1
+```
+
 ## Container structures
 
 ```bash

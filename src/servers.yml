@@ -1,0 +1,22 @@
+LaravelWeb1:
+  hostname: 13.112.197.49
+  stage: LaravelWeb1
+  user: ec2-user
+  port: 22
+  identityFile: ~/.ssh/MyKeypair.pem
+  deploy_path: /var/www/
+  branch: main
+  repository: https://github.com/tokku5552/php-docker-nginx-postgresql.git
+  target_group_arn: arn:aws:elasticloadbalancing:ap-northeast-1:294892136588:targetgroup/LaravelTargetGroup/43da03d4197425a6
+  instance_id: i-07e4b8df05bf7fca1
+LaravelWeb2:
+  hostname: 18.181.224.249
+  stage: LaravelWeb2
+  user: ec2-user
+  port: 22
+  identityFile: ~/.ssh/MyKeypair.pem
+  deploy_path: /var/www/
+  branch: main
+  repository: https://github.com/tokku5552/php-docker-nginx-postgresql.git
+  target_group_arn: arn:aws:elasticloadbalancing:ap-northeast-1:294892136588:targetgroup/LaravelTargetGroup/43da03d4197425a6
+  instance_id: i-04b45b695f79c20fd
