@@ -25,6 +25,8 @@ services:
         target: /root/.config/psysh
         volume:
           nocopy: true
+    env_file:
+      - docker/php/.env
     environment:
       - DB_CONNECTION=pgsql
       - DB_HOST=db
@@ -32,6 +34,8 @@ services:
       - DB_DATABASE=${DB_NAME:-laravel_local}
       - DB_USERNAME=${DB_USER:-phper}
       - DB_PASSWORD=${DB_PASS:-secret}
+      - AWS_DEFAULT_REGION=ap-northeast-1
+      - AWS_DEFAULT_OUTPUT=json
 
   web:
     build:

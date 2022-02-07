@@ -27,4 +27,8 @@ RUN apt-get update && \
 COPY ./docker/php/php-fpm.d/zzz-www.conf /usr/local/etc/php-fpm.d/zzz-www.conf
 COPY ./docker/php/php.ini /usr/local/etc/php/php.ini
 
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install
+
 WORKDIR /work/src
