@@ -24,7 +24,7 @@ jobs:
 
       - name: composer install
         if: steps.cache.outputs.cache-hit != 'true'
-        run: composer install -n --prefer-dist
+        run: composer install
         working-directory: ./src
 
       - name: install awscli
@@ -58,4 +58,4 @@ jobs:
           # ssh-keyscan サーバーのIP >> ~/.ssh/known_hosts
 
           # デプロイ
-          cd .src/ && ./vender/bin/dep deploy LaravelWeb1 -vvv
+          ./vender/bin/dep deploy LaravelWeb1 -vvv
