@@ -27,12 +27,7 @@ jobs:
         run: composer install -n --prefer-dist
         working-directory: ./src
 
-      - name: deploy to EC2 with rolling updates
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ap-northeast-1
-          AWS_DEFAULT_OUTPUT: json
+      - name: install awscli
         working-directory: ./src
         run: |
           # AWS CLIインストール
@@ -41,6 +36,14 @@ jobs:
           sudo ./aws/install --update
           aws --version
 
+      - name: deploy to EC2 with rolling updates
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-1
+          AWS_DEFAULT_OUTPUT: json
+        working-directory: ./src
+        run: |
           # AWS CLI設定
           # printf "${ACCESS_KEY}\n${SECRET_ACCESS_KEY}\nap-northeast-1\njson\n" | aws configure 
           # aws configure get aws_access_key_id 
@@ -55,4 +58,4 @@ jobs:
           # ssh-keyscan サーバーのIP >> ~/.ssh/known_hosts
 
           # デプロイ
-          ./vender/bin/dep deploy LaravelWeb1 -vvv
+          cd .src/ && ./vender/bin/dep deploy LaravelWeb1 -vvv
