@@ -55,4 +55,4 @@ jobs:
           # ssh-keyscan サーバーのIP >> ~/.ssh/known_hosts
 
           # デプロイ
-          vender/bin/dep deploy LaravelWeb1 -vvv
+          ./vender/bin/dep deploy LaravelWeb1 -vvv
