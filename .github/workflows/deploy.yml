@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Setup PHP 7.4
+        run: sudo update-alternatives --set php /usr/bin/php7.4
+
       - name: cache vendor
         id: cache
         uses: actions/cache@v1
@@ -21,7 +24,8 @@ jobs:
 
       - name: composer install
         if: steps.cache.outputs.cache-hit != 'true'
-        run: cd ./src && composer install -n --prefer-dist
+        run: composer install -n --prefer-dist
+        working-directory: ./src
 
       - name: deploy to EC2 with rolling updates
         env:
@@ -29,6 +33,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ap-northeast-1
           AWS_DEFAULT_OUTPUT: json
+        working-directory: ./src
         run: |
           # AWS CLIインストール
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -50,4 +55,4 @@ jobs:
           # ssh-keyscan サーバーのIP >> ~/.ssh/known_hosts
 
           # デプロイ
-          cd ./src && vender/bin/dep deploy LaravelWeb1 -vvv
+          vender/bin/dep deploy LaravelWeb1 -vvv
