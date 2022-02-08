@@ -21,7 +21,7 @@ jobs:
 
       - name: composer install
         if: steps.cache.outputs.cache-hit != 'true'
-        run: composer install -n --prefer-dist
+        run: cd .src/ && composer install -n --prefer-dist
 
       - name: deploy to EC2 with rolling updates
         env:
