@@ -2,7 +2,8 @@ name: deploy stg
 
 on:
   push:
-    # branches: [対象ブランチ名]
+    branches:
+      - main
 
 jobs:
   unit-test:
