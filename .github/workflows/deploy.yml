@@ -46,6 +46,7 @@ jobs:
           chmod 600 /home/runner/.ssh/MyKeypair.pem
           # known_hostsに追加
           ssh-keyscan 13.112.197.49 >> ~/.ssh/known_hosts
+          ssh-keyscan 18.181.224.249 >> ~/.ssh/known_hosts
 
       - name: deploy to EC2 with rolling updates
         env:
@@ -55,9 +56,6 @@ jobs:
           AWS_DEFAULT_OUTPUT: json
         working-directory: ./src
         run: |
-          # AWS CLI設定
-          # printf "${ACCESS_KEY}\n${SECRET_ACCESS_KEY}\nap-northeast-1\njson\n" | aws configure 
-          # aws configure get aws_access_key_id 
-
           # デプロイ
           vendor/bin/dep deploy LaravelWeb1 -vvv
+          vendor/bin/dep deploy LaravelWeb2 -vvv
