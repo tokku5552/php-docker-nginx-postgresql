@@ -45,7 +45,7 @@ jobs:
           echo "${{ secrets.SSH_DEPLOY_KEY }}" > /home/runner/.ssh/MyKeypair.pem
           chmod 600 /home/runner/.ssh/MyKeypair.pem
           # known_hostsに追加
-          # ssh-keyscan サーバーのIP >> ~/.ssh/known_hosts
+          ssh-keyscan 13.112.197.49 >> ~/.ssh/known_hosts
 
       - name: deploy to EC2 with rolling updates
         env:
