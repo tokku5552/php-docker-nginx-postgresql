@@ -48,3 +48,32 @@ after('deploy:unlock', 'register-targets');
 task('register-targets', function () {
   runLocally('aws elbv2 register-targets --target-group-arn {{target_group_arn}} --targets Id={{instance_id}},Port=80 ');
 });
+
+after('register-targets', 'describe-target-health');
+task('describe-target-health', function () {
+  $retry_count = 10;
+  $i = 0;
+  while ($i <= $retry_count) {
+    $result = runLocally('aws elbv2 describe-target-health --target-group-arn {{target_group_arn}}');
+    $obj = json_decode($result);
+    foreach ($obj->TargetHealthDescriptions as $val) {
+      if ($val->Target->Id === get('instance_id')) {
+        if ($val->TargetHealth->State != 'healthy') {
+          if ($i == $retry_count) {
+            writeln('The preparation was not completed. Please try later');
+            exit(1);
+          }
+          writeln('waiting...');
+          break;
+        } else {
+          writeln('{{instance_id}} is healthy');
+          return;
+        };
+      } else {
+        break;
+      }
+    }
+    sleep(1);
+    $i++;
+  }
+});
