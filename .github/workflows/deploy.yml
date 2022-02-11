@@ -1,0 +1,93 @@
+name: deploy stg
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup PHP 7.4
+        run: sudo update-alternatives --set php /usr/bin/php7.4
+
+      - name: cache vendor
+        id: cache
+        uses: actions/cache@v1
+        with:
+          ref: main
+          path: ./vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: composer install
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: composer install
+        working-directory: ./src
+
+      - name: set laravel env
+        run: echo "${{ secrets.LARAVEL_ENV }}" > .env
+        working-directory: ./src
+
+      - name: run unit test
+        run: vendor/bin/phpunit tests/
+        working-directory: ./src
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: unit-test
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup PHP 7.4
+        run: sudo update-alternatives --set php /usr/bin/php7.4
+
+      - name: cache vendor
+        id: cache
+        uses: actions/cache@v1
+        with:
+          ref: main
+          path: ./vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: composer install
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: composer install
+        working-directory: ./src
+
+      - name: install awscli
+        working-directory: ./src
+        run: |
+          # AWS CLIインストール
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install --update
+          aws --version
+
+      - name: setup ssh
+        working-directory: ./src
+        run: |
+          # sshキーをコピー
+          mkdir -p /home/runner/.ssh
+          touch /home/runner/.ssh/MyKeypair.pem
+          echo "${{ secrets.SSH_DEPLOY_KEY }}" > /home/runner/.ssh/MyKeypair.pem
+          chmod 600 /home/runner/.ssh/MyKeypair.pem
+          # known_hostsに追加
+          ssh-keyscan 13.112.197.49 >> ~/.ssh/known_hosts
+          ssh-keyscan 18.181.224.249 >> ~/.ssh/known_hosts
+
+      - name: deploy to EC2 with rolling updates
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-1
+          AWS_DEFAULT_OUTPUT: json
+        working-directory: ./src
+        run: |
+          # デプロイ
+          vendor/bin/dep deploy LaravelWeb1 -vvv
+          vendor/bin/dep deploy LaravelWeb2 -vvv
